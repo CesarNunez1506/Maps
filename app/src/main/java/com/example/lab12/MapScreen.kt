@@ -1,17 +1,22 @@
 package com.example.lab12
 
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
+import android.util.Log
+import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.Marker
-
 
 @Composable
 fun MapScreen() {
@@ -20,18 +25,33 @@ fun MapScreen() {
         position = com.google.android.gms.maps.model.CameraPosition.fromLatLngZoom(ArequipaLocation, 12f)
     }
 
+    val context = LocalContext.current
+
+    val icon: BitmapDescriptor? = try {
+        val drawable: Drawable? = ContextCompat.getDrawable(context, R.drawable.monta_a)
+        if (drawable is BitmapDrawable) {
+            val bitmap: Bitmap = drawable.bitmap
+            BitmapDescriptorFactory.fromBitmap(bitmap)
+        } else {
+            Log.e("MapScreen", "El recurso no es un BitmapDrawable.")
+            null
+        }
+    } catch (e: Exception) {
+        Log.e("MapScreen", "Error al cargar el ícono desde drawable: ${e.message}")
+        null
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Añadir GoogleMap al layout
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState
         ) {
-            // Añadir marcador en Denver, Colorado
             Marker(
                 state = rememberMarkerState(position = ArequipaLocation),
+                icon = icon ?: BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED), 
                 title = "Arequipa, Perú"
             )
         }
     }
+
 }
