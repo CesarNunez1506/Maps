@@ -6,6 +6,7 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Polygon
+import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 
 @Composable
@@ -21,7 +22,6 @@ fun PoligonosScreen() {
         LatLng(-16.432566, -71.508853)
     )
 
-
     val parqueLambramaniPolygon = listOf(
         LatLng(-16.422704, -71.530830),
         LatLng(-16.422920, -71.531340),
@@ -36,6 +36,25 @@ fun PoligonosScreen() {
         LatLng(-16.399299, -71.536721)
     )
 
+    val Campiña = listOf(
+        LatLng(-16.450000, -71.500000),
+        LatLng(-16.451000, -71.501000),
+        LatLng(-16.452000, -71.500000),
+        LatLng(-16.451000, -71.499000)
+    )
+
+    val Molino = listOf(
+        LatLng(-16.460000, -71.520000),
+        LatLng(-16.461000, -71.521000),
+        LatLng(-16.462000, -71.520000),
+        LatLng(-16.461000, -71.519000)
+    )
+
+    val Linea = listOf(
+        LatLng(-16.432566, -71.508853),  // Mall Aventura
+        LatLng(-16.423050, -71.530600),  // Parque Lambramani
+        LatLng(-16.398866, -71.536961)   // Plaza de Armas
+    )
 
     GoogleMap(cameraPositionState = cameraPositionState) {
         Polygon(
@@ -56,6 +75,22 @@ fun PoligonosScreen() {
             fillColor = Color.Blue,
             strokeWidth = 5f
         )
-
+        Polygon(
+            points = Campiña,
+            strokeColor = Color.Green,
+            fillColor = Color.Yellow,
+            strokeWidth = 5f
+        )
+        Polygon(
+            points = Molino,
+            strokeColor = Color.Green,
+            fillColor = Color.Yellow,
+            strokeWidth = 5f
+        )
+        Polyline(
+            points = Linea,
+            color = Color.Black,
+            width = 5f
+        )
     }
 }
