@@ -10,6 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import android.util.Log
+import androidx.compose.runtime.LaunchedEffect
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.maps.android.compose.GoogleMap
@@ -67,6 +69,13 @@ fun MapScreen() {
             snippet = "Punto de interés"
         )
     }
+    LaunchedEffect(Unit) {
+        cameraPositionState.animate(
+            update = CameraUpdateFactory.newLatLngZoom(LatLng(-16.2520984,-71.6836503), 12f), // Mover a Yura
+            durationMs = 3000
+        )
+    }
+
 
 }
 
