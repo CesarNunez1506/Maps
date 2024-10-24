@@ -51,9 +51,9 @@ fun PoligonosScreen() {
     )
 
     val Linea = listOf(
-        LatLng(-16.432566, -71.508853),  // Mall Aventura
-        LatLng(-16.423050, -71.530600),  // Parque Lambramani
-        LatLng(-16.398866, -71.536961)   // Plaza de Armas
+        LatLng(-16.432566, -71.508853),
+        LatLng(-16.423050, -71.530600),
+        LatLng(-16.398866, -71.536961)
     )
 
     GoogleMap(cameraPositionState = cameraPositionState) {

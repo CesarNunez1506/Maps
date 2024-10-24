@@ -1,86 +1,100 @@
 package com.example.lab12
 
-import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.core.content.ContextCompat
-import android.util.Log
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.model.BitmapDescriptor
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import androidx.compose.ui.unit.dp
+import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
-import com.google.maps.android.compose.Polygon
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
+import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MapType
+import androidx.compose.runtime.remember
+import androidx.compose.foundation.layout.*
+import androidx.compose.ui.Alignment
 
 @Composable
 fun MapScreen() {
     val ArequipaLocation = LatLng(-16.4040102, -71.559611) // Arequipa, Perú
     val cameraPositionState = rememberCameraPositionState {
-        position = com.google.android.gms.maps.model.CameraPosition.fromLatLngZoom(ArequipaLocation, 12f)
+        position = CameraPosition.fromLatLngZoom(ArequipaLocation, 12f)
     }
 
-    val context = LocalContext.current
+    val tiposMapas = listOf("Normal", "Satélite", "Híbrido", "Terreno", "Ninguno")
+    var selectedMapType by remember { mutableStateOf(0) }
+    var showDropdown by remember { mutableStateOf(false) }
+    var showBsAiresMarker by remember { mutableStateOf(false) }
 
-    // Cargar el ícono personalizado desde drawable
-    val icon: BitmapDescriptor? = try {
-        val drawable: Drawable? = ContextCompat.getDrawable(context, R.drawable.monta_a)
-        if (drawable is BitmapDrawable) {
-            val bitmap: Bitmap = drawable.bitmap
-            BitmapDescriptorFactory.fromBitmap(bitmap)
-        } else {
-            Log.e("MapScreen", "El recurso no es un BitmapDrawable.")
-            null
-        }
-    } catch (e: Exception) {
-        Log.e("MapScreen", "Error al cargar el ícono desde drawable: ${e.message}")
-        null
-    }
+    Column(modifier = Modifier.fillMaxSize()) {
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        GoogleMap(
-            modifier = Modifier.fillMaxSize(),
-            cameraPositionState = cameraPositionState
+        Box(modifier = Modifier
+            .padding(16.dp)
+            .clickable { showDropdown = true }
         ) {
-            // Añadir marcador en Arequipa con ícono personalizado
+
+            Text(text = tiposMapas[selectedMapType])
+        }
+
+        DropdownMenu(
+            expanded = showDropdown,
+            onDismissRequest = { showDropdown = false }
+        ) {
+            tiposMapas.forEachIndexed { index, tipo ->
+                DropdownMenuItem(
+                    onClick = {
+                        selectedMapType = index
+                        showDropdown = false
+                    },
+                    text = { Text(text = tipo) }
+                )
+            }
+        }
+
+        GoogleMap(
+            modifier = Modifier.weight(1f),
+            cameraPositionState = cameraPositionState,
+            properties = MapProperties(
+                mapType = when (selectedMapType) {
+                    0 -> MapType.NORMAL
+                    1 -> MapType.SATELLITE
+                    2 -> MapType.HYBRID
+                    3 -> MapType.TERRAIN
+                    else -> MapType.NONE
+                }
+            )
+        ) {
+
             Marker(
                 state = rememberMarkerState(position = ArequipaLocation),
-                icon = icon ?: BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED), // Usar ícono personalizado o predeterminado
                 title = "Arequipa, Perú"
             )
 
-            // Añadir otros marcadores
-            val locations = listOf(
-                LatLng(-16.433415, -71.5442652), // JLByR
-                LatLng(-16.4205151, -71.4945209), // Paucarpata
-                LatLng(-16.3524187, -71.5675994) // Zamacola
-            )
-
-            locations.forEach { location ->
+            if (showBsAiresMarker) {
+                val bsAiresLocation = LatLng(-34.603722, -58.381592)
                 Marker(
-                    state = rememberMarkerState(position = location),
-                    title = "Ubicación",
-                    snippet = "Punto de interés"
+                    state = rememberMarkerState(position = bsAiresLocation),
+                    title = "Buenos Aires, Argentina"
                 )
             }
-
         }
-    }
 
-    // Mover la cámara a Yura después de cargar el mapa
-    LaunchedEffect(Unit) {
-        cameraPositionState.animate(
-            update = CameraUpdateFactory.newLatLngZoom(LatLng(-16.2520984, -71.6836503), 12f),
-            durationMs = 3000
-        )
+        Button(
+            onClick = { showBsAiresMarker = !showBsAiresMarker },
+            modifier = Modifier
+                .padding(16.dp)
+                .align(Alignment.CenterHorizontally)
+        ) {
+            Text(text = if (showBsAiresMarker) "Eliminar Marcador en Buenos Aires" else "Agregar Marcador en Buenos Aires")
+        }
     }
 }
